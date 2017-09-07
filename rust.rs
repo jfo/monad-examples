@@ -2,16 +2,21 @@ trait Monad<T> {
     fn unit(self, T) -> Self;
 }
 
-#[derive(Debug)]
-pub enum ID<T> {
+enum ID<T> {
     Value(T)
 }
 
-impl Monad<i32> {
 
-}
+
+// impl Monad<T> for ID<T> { 
+//     fn unit(self, x: T) -> Self {
+//         return self;
+//     }
+
+// }
 
 
 fn main() {
+    let x = ID::Value(1);
 
 }
