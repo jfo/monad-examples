@@ -1,8 +1,8 @@
-<?
+<?php
 
 interface Monad {
     public static function unit($x);
-    public function bind($fn);
+    public function bind(callable $fn);
 }
 
 class ID implements Monad {
@@ -17,15 +17,28 @@ class ID implements Monad {
         return new ID($x);
     }
 
-    public function bind($fn) {
-        return self::unit($fn($this->value));
+    public function bind(callable $fn) {
+        return $fn($this->value);
     }
 
+    public function compose(callable $g, callable $f) {
+        return $g($this->value)->bind($f);
+    }
 }
 
-$m = ID::unit(1);
+$increment = function($n) { return ID::unit($n + 1); };
+$times2    = function($n) { return ID::unit($n * 2); };
 
-$increment = function($n) { return $n + 1; };
-var_dump($m->bind($increment));
-var_dump($m);
+var_dump(
+    ID::unit(1)->bind($increment) == $increment(1)
+);
 
+var_dump(
+    ID::unit(1)->bind("ID::unit") == ID::unit(1)
+);
+
+var_dump(
+    ID::unit(1)->compose($increment, $times2)->bind($increment)
+    ==
+    ID::unit(1)->bind($increment)->compose($times2, $increment)
+);
